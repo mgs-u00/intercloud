@@ -32,8 +32,8 @@
                 "remoteIP": "127.0.0.1",
                 "remotePort": 6633
             },
-            "x": "618.0",
-            "y": "387.0"
+            "x": "759.0",
+            "y": "303.0"
         }
     ],
     "hosts": [
@@ -41,80 +41,122 @@
             "number": "1",
             "opts": {
                 "attributes": {
-                    "city": "Ottawa",
-                    "country": "Ontario",
-                    "lat": "45.4208777",
-                    "lon": "-75.6901106",
-                    "mac": "b2:5f:44:69:88:b1"
+                    "mac": "5a:9c:d2:94:fc:1c"
                 },
                 "hostname": "h1",
                 "nodeNum": 1,
                 "sched": "host"
             },
-            "x": "229.0",
-            "y": "521.0"
+            "x": "352.0",
+            "y": "570.0"
         },
         {
             "number": "2",
             "opts": {
                 "attributes": {
-                    "mac": "16:12:f7:01:1e:59"
+                    "mac": "66:9c:05:5d:6e:0f"
                 },
                 "hostname": "h2",
                 "nodeNum": 2,
                 "sched": "host"
             },
-            "x": "243.0",
-            "y": "113.0"
+            "x": "345.0",
+            "y": "25.0"
+        },
+        {
+            "number": "3",
+            "opts": {
+                "attributes": {
+                    "mac": "16:18:11:56:92:98"
+                },
+                "hostname": "h3",
+                "nodeNum": 3,
+                "sched": "host"
+            },
+            "x": "212.0",
+            "y": "571.0"
         }
     ],
     "links": [
         {
-            "dest": "s4",
+            "dest": "s1",
             "opts": {
-                "delay": "0.0ms",
-                "useNodeGeo": "1"
+                "port1": 1,
+                "port2": 1
             },
             "src": "h1"
         },
         {
-            "dest": "s1",
+            "dest": "s3",
             "opts": {
-                "delay": "34.502995046123516ms",
+                "delay": "17.93292931030975ms",
+                "port1": 2,
+                "port2": 1,
                 "useNodeGeo": "1"
+            },
+            "src": "s1"
+        },
+        {
+            "dest": "s4",
+            "opts": {
+                "delay": "1.8035835333627381ms",
+                "port1": 3,
+                "port2": 1,
+                "useNodeGeo": "1"
+            },
+            "src": "s1"
+        },
+        {
+            "dest": "s2",
+            "opts": {
+                "port1": 2,
+                "port2": 1
             },
             "src": "s4"
         },
         {
             "dest": "s2",
             "opts": {
-                "delay": "1.8035835333627381ms",
-                "useNodeGeo": "1"
+                "port1": 2,
+                "port2": 2
             },
-            "src": "s4"
+            "src": "s3"
+        },
+        {
+            "dest": "h2",
+            "opts": {
+                "port1": 3,
+                "port2": 1
+            },
+            "src": "s2"
+        },
+        {
+            "dest": "s6",
+            "opts": {
+                "port1": 2,
+                "port2": 1
+            },
+            "src": "h3"
         },
         {
             "dest": "s3",
             "opts": {
-                "delay": "17.93292931030975ms",
+                "delay": "1.1440531033170556ms",
+                "port1": 2,
+                "port2": 5,
                 "useNodeGeo": "1"
             },
-            "src": "s4"
+            "src": "s6"
         },
         {
-            "dest": "h2",
-            "opts": {},
-            "src": "s1"
-        },
-        {
-            "dest": "h2",
-            "opts": {},
-            "src": "s2"
-        },
-        {
-            "dest": "h2",
-            "opts": {},
-            "src": "s3"
+            "dest": "s4",
+            "opts": {
+                "delay": "19.52290246890776ms",
+                "port1": 3,
+                "port2": 5,
+                "useNodeGeo": "1"
+            },
+            "src": "s6"
         }
     ],
     "switches": [
@@ -122,17 +164,17 @@
             "number": "1",
             "opts": {
                 "attributes": {
-                    "city": "Tokyo",
-                    "country": "Japan",
+                    "city": "Ottawa",
+                    "country": "Canada",
                     "datacenter": 1,
-                    "lat": "35.6821936",
-                    "lon": "139.762221",
-                    "mac": "d2:09:3d:b3:00:01"
+                    "lat": "45.4208777",
+                    "lon": "-75.6901106",
+                    "mac": "9e:6a:3f:6e:6b:89"
                 },
                 "controllers": [
                     "c0"
                 ],
-                "dpid": 101,
+                "dpid": "101",
                 "hostname": "s1",
                 "netflow": "0",
                 "nodeNum": 1,
@@ -140,19 +182,15 @@
                 "switchIP": "",
                 "switchType": "default"
             },
-            "x": "90.0",
-            "y": "272.0"
+            "x": "351.0",
+            "y": "464.0"
         },
         {
             "number": "2",
             "opts": {
                 "attributes": {
-                    "city": "New York",
-                    "country": "United States",
                     "datacenter": 1,
-                    "lat": "40.7127281",
-                    "lon": "-74.0060152",
-                    "mac": "0a:89:ee:4f:01:98"
+                    "mac": "d6:65:d6:2d:76:b2"
                 },
                 "controllers": [
                     "c0"
@@ -165,24 +203,24 @@
                 "switchIP": "",
                 "switchType": "default"
             },
-            "x": "240.0",
-            "y": "273.0"
+            "x": "339.0",
+            "y": "111.0"
         },
         {
             "number": "3",
             "opts": {
                 "attributes": {
                     "city": "London",
-                    "country": "United Kingdom",
+                    "country": "England",
                     "datacenter": 1,
                     "lat": "51.4893335",
                     "lon": "-0.14405508452768728",
-                    "mac": "aa:c1:02:db:19:b0"
+                    "mac": "c2:b1:26:17:20:c6"
                 },
                 "controllers": [
                     "c0"
                 ],
-                "dpid": 102,
+                "dpid": "103",
                 "hostname": "s3",
                 "netflow": "0",
                 "nodeNum": 3,
@@ -190,24 +228,24 @@
                 "switchIP": "",
                 "switchType": "default"
             },
-            "x": "404.0",
-            "y": "275.0"
+            "x": "143.0",
+            "y": "267.0"
         },
         {
             "number": "4",
             "opts": {
                 "attributes": {
-                    "city": "Ottawa",
-                    "country": "Ontario",
+                    "city": "New York",
+                    "country": "United States",
                     "datacenter": 1,
-                    "lat": "45.4208777",
-                    "lon": "-75.6901106",
-                    "mac": "c6:cf:45:a3:bd:b0"
+                    "lat": "40.7127281",
+                    "lon": "-74.0060152",
+                    "mac": "32:46:fc:c4:55:03"
                 },
                 "controllers": [
                     "c0"
                 ],
-                "dpid": 103,
+                "dpid": "102",
                 "hostname": "s4",
                 "netflow": "0",
                 "nodeNum": 4,
@@ -215,8 +253,33 @@
                 "switchIP": "",
                 "switchType": "default"
             },
-            "x": "236.0",
-            "y": "414.0"
+            "x": "474.0",
+            "y": "252.0"
+        },
+        {
+            "number": "6",
+            "opts": {
+                "attributes": {
+                    "city": "Paris",
+                    "country": "France",
+                    "datacenter": 1,
+                    "lat": "48.8534951",
+                    "lon": "2.3483915",
+                    "mac": "1e:9f:95:3c:e9:ba"
+                },
+                "controllers": [
+                    "c0"
+                ],
+                "dpid": 104,
+                "hostname": "s6",
+                "netflow": "0",
+                "nodeNum": 6,
+                "sflow": "0",
+                "switchIP": "",
+                "switchType": "default"
+            },
+            "x": "204.0",
+            "y": "458.0"
         }
     ],
     "version": "2"

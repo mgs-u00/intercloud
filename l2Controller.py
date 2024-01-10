@@ -3,6 +3,7 @@ from pox.lib.addresses import *
 import pox.openflow.libopenflow_01 as of
 import json
 import binascii
+import queue
 
 log = core.getLogger()
 
@@ -26,7 +27,7 @@ class LearningSwitch (object):
         self.connection = connection
         # create mapping dict
         self.mac_to_port = {}
-        self.learnPaths('topo2.mn')
+        self.learnPaths('topo.mn')
         connection.addListeners(self)
 
     def learnPaths(self, topology):
@@ -111,7 +112,7 @@ class LearningSwitch (object):
                     self.bestPaths[self.nodeMACMap[calc[minWeight][-1]]] = {}    
                 self.bestPaths[self.nodeMACMap[node]][self.nodeMACMap[calc[minWeight][-1]]] = calc[minWeight]
                 self.bestPaths[self.nodeMACMap[calc[minWeight][-1]]][self.nodeMACMap[node]] = calc[minWeight][::-1]
-                # print(self.bestPaths)
+                print(self.bestPaths)
         
         # print(self.bestPaths, self.nodemap, self.nodeAttribs)
         
@@ -120,15 +121,17 @@ class LearningSwitch (object):
         # ID == DPID?
         dpid = str(hex(int(event.connection.dpid))[2:])
         curNode = self.nodeID[dpid]
-
-        print("On " + curNode, packet.src, packet.dst)
         source = str(packet.src)
         dest = str(packet.dst)
 
 
-        # if dest == 'ff:ff:ff:ff:ff:ff':
-        #     packet.dst = EthAddr(self.nodeMACMap['h2'])
-        #     dest = str(packet.dst)
+        if dest == 'ff:ff:ff:ff:ff:ff':
+            # packet.dst = EthAddr(self.nodeMACMap['h2'])
+            # dest = str(packet.dst)
+            if source != self.nodeMACMap['h2']:
+                dest = self.nodeMACMap['h2']
+            else:
+                dest = self.nodeMACMap['h1']
         
         
         # print(packet.dst)
@@ -136,14 +139,27 @@ class LearningSwitch (object):
         if source in self.bestPaths and dest in self.bestPaths[source] and curNode in self.bestPaths[source][dest]:
             
             path = self.bestPaths[source][dest]
-            print(path)
+            # print(path)
             nextNode = path[path.index(curNode) + 1]
 
             # print(self.destHostMap)
 
             out_port = self.destHostMap[curNode][nextNode]
 
-            print("On " + curNode + " Sending to " + nextNode + " Over Port " + str(out_port))
+            print("On " + curNode + " Sending to " + nextNode + " Over Port " + str(out_port) + ", Full Path: " + str(path))
+            
+            # create the send packet action
+            action = of.ofp_action_output(port=out_port)
+            
+
+            # Send the action to the switch
+            # Create event message
+            msg = of.ofp_packet_out()
+            msg.data = event.ofp
+            msg.actions.append(action)
+            self.connection.send(msg)
+            
+            
 
                 
 
@@ -156,30 +172,33 @@ class LearningSwitch (object):
         # TODO (figure out how to know where to send packet, now know where I am and where it came from, not sure which port to send) use the event port and src/dest info to know direction to send 
 
         # update mac to port mapping
-        else:
-            self.mac_to_port[packet.src] = event.port
+        # elif dest == 'ff:ff:ff:ff:ff:ff':
 
-            # If dest known, send packet to the mapped port
-            if packet.dst in self.mac_to_port:
-                out_port = self.mac_to_port[packet.dst]
+        #     print("On " + curNode, packet.src, packet.dst)
+        #     self.mac_to_port[packet.src] = event.port
+
+        #     # If dest known, send packet to the mapped port
+        #     # if packet.dst in self.mac_to_port:
+        #     #     out_port = self.mac_to_port[packet.dst]
             
-            # Otherwise, flood the switch
-            else:
-                out_port = of.OFPP_FLOOD
+        #     # # Otherwise, flood the switch
+        #     # else:
+        #     out_port = of.OFPP_FLOOD
+
+        #     # create the send packet action
+        #     action = of.ofp_action_output(port=out_port)
+            
+
+        #     # Send the action to the switch
+        #     # Create event message
+        #     msg = of.ofp_packet_out()
+        #     msg.data = event.ofp
+        #     msg.actions.append(action)
+        #     self.connection.send(msg)
         
-        print(out_port)
-
-        # Create event message
-        msg = of.ofp_packet_out()
-        msg.data = event.ofp
-
-        # create the send packet action
-        action = of.ofp_action_output(port=out_port)
+        # print(out_port)
         
-
-        # Send the action to the switch
-        msg.actions.append(action)
-        self.connection.send(msg)
+        
 
         
 

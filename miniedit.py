@@ -2839,21 +2839,19 @@ class MiniEdit( Frame ):
         "Add link to model."
         if linkopts is None:
             linkopts = {}
-        
         if source not in self.hostPortCounter:
             self.hostPortCounter[source] = 0
+            self.hostPortCounter[source] += 1
         if dest not in self.hostPortCounter:
             self.hostPortCounter[dest] = 0
+            self.hostPortCounter[dest] += 1
         
-        self.hostPortCounter[source] += 1
-        self.hostPortCounter[dest] += 1
 
         sourcePort = self.hostPortCounter[source]
         destPort = self.hostPortCounter[dest]
-
-        linkopts['port1'] = sourcePort
-        linkopts['port2'] = destPort
-        
+        if 'port1' not in linkopts or 'port2' not in linkopts:
+            linkopts['port1'] = sourcePort
+            linkopts['port2'] = destPort
         source.links[ dest ] = self.link
         dest.links[ source ] = self.link
         self.links[ self.link ] = {'type' :linktype,
