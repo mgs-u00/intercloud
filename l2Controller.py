@@ -35,7 +35,10 @@ class LearningSwitch (object):
             topology = json.load(fp)
 
         metricWeights = {
-            'delay': 1
+            'delay': 0.25,
+            'cost' : 0.2,
+            'bw': 0.2,
+            'processing': 0.35
         }
         
         # Map of MAC to node name
@@ -96,12 +99,35 @@ class LearningSwitch (object):
                 calc = {}
                 for path in paths:
                     overallWeight = 0
+                    minbandwidth = 999999999999999999999999999
+                    totalDelay = 0
+                    totalCost = 0
                     for i in range(1, len(path)):
                         for elem in metricWeights:
                             link = "".join([path[i-1], path[i]])
                             if elem in self.linkAttribs[link]:
                                 if elem == 'delay':
-                                    overallWeight += metricWeights[elem] * float(self.linkAttribs[link][elem][:-2])
+                                    totalDelay += float(self.linkAttribs[link][elem][:-2])
+                                elif elem == 'cost':
+                                    totalCost += int(self.linkAttribs[link][elem])
+                                elif elem == 'bw':
+                                    if int(self.linkAttribs[link][elem]) < minbandwidth:
+                                        minbandwidth = int(self.linkAttribs[link][elem])
+                                
+                    if minbandwidth != 999999999999999999999999999:
+                        print("Min bandwidth: " + str(minbandwidth))
+                        overallWeight += metricWeights['bw'] * (1 / minbandwidth)
+                    if totalDelay != 0:
+                        print("Delay: " + str(totalDelay))
+                        overallWeight += metricWeights[elem] * totalDelay
+                    if totalCost != 0:
+                        print("Cost: " + str(totalCost))
+                        overallWeight += metricWeights[elem] * totalCost
+                    print("Processing cost: " + str(len(path)))
+                    overallWeight += metricWeights['processing'] * len(path)
+                    print("Total cost: " + str(overallWeight))
+                    print(str(path) + "\n\n")
+
                     calc[overallWeight] = path
                 # print(calc)
                 minWeight = min(list(calc.keys()))
@@ -112,13 +138,12 @@ class LearningSwitch (object):
                     self.bestPaths[self.nodeMACMap[calc[minWeight][-1]]] = {}    
                 self.bestPaths[self.nodeMACMap[node]][self.nodeMACMap[calc[minWeight][-1]]] = calc[minWeight]
                 self.bestPaths[self.nodeMACMap[calc[minWeight][-1]]][self.nodeMACMap[node]] = calc[minWeight][::-1]
-                print(self.bestPaths)
+                print("Best Path: " + str(self.bestPaths) + "\n\n\n\n")
         
         # print(self.bestPaths, self.nodemap, self.nodeAttribs)
         
     def _handle_PacketIn (self, event):
         packet = event.parsed
-        # ID == DPID?
         dpid = str(hex(int(event.connection.dpid))[2:])
         curNode = self.nodeID[dpid]
         source = str(packet.src)

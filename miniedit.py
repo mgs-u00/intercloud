@@ -1045,6 +1045,12 @@ class LinkDialog(tkSimpleDialog.Dialog):
         else:
             self.useNodeGeoButton.select()
 
+        Label(master, text="Dollar cost (cents):").grid(row=7, sticky=E)
+        self.dollarCost = Entry(master)
+        self.dollarCost.grid(row=7, column=1)
+        if 'cost' in self.linkValues:
+            self.dollarCost.insert(0, self.linkValues['cost'])
+
         return self.e1 # initial focus
 
     def apply(self):
@@ -1064,6 +1070,9 @@ class LinkDialog(tkSimpleDialog.Dialog):
 
         useGeo = str(self.useNodeGeo.get())
         self.result['useNodeGeo'] = useGeo
+
+        if len(self.dollarCost.get()) > 0:
+            self.result['cost'] = int(self.dollarCost.get())
         
 
 class ControllerDialog(tkSimpleDialog.Dialog):
@@ -2840,11 +2849,9 @@ class MiniEdit( Frame ):
         if linkopts is None:
             linkopts = {}
         if source not in self.hostPortCounter:
-            self.hostPortCounter[source] = 0
-            self.hostPortCounter[source] += 1
+            self.hostPortCounter[source] = 1
         if dest not in self.hostPortCounter:
-            self.hostPortCounter[dest] = 0
-            self.hostPortCounter[dest] += 1
+            self.hostPortCounter[dest] = 1
         
 
         sourcePort = self.hostPortCounter[source]
@@ -2852,6 +2859,8 @@ class MiniEdit( Frame ):
         if 'port1' not in linkopts or 'port2' not in linkopts:
             linkopts['port1'] = sourcePort
             linkopts['port2'] = destPort
+            self.hostPortCounter[source] += 1
+            self.hostPortCounter[dest] += 1
         source.links[ dest ] = self.link
         dest.links[ source ] = self.link
         self.links[ self.link ] = {'type' :linktype,
