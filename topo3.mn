@@ -1,0 +1,520 @@
+{
+    "application": {
+        "dpctl": "",
+        "ipBase": "10.0.0.0/8",
+        "netflow": {
+            "nflowAddId": "0",
+            "nflowTarget": "",
+            "nflowTimeout": "600"
+        },
+        "openFlowVersions": {
+            "ovsOf10": "1",
+            "ovsOf11": "0",
+            "ovsOf12": "0",
+            "ovsOf13": "0"
+        },
+        "sflow": {
+            "sflowHeader": "128",
+            "sflowPolling": "30",
+            "sflowSampling": "400",
+            "sflowTarget": ""
+        },
+        "startCLI": "1",
+        "switchType": "ovs",
+        "terminalType": "xterm"
+    },
+    "controllers": [
+        {
+            "opts": {
+                "controllerProtocol": "tcp",
+                "controllerType": "remote",
+                "hostname": "c0",
+                "remoteIP": "127.0.0.1",
+                "remotePort": 6633
+            },
+            "x": "957.0",
+            "y": "140.0"
+        }
+    ],
+    "hosts": [
+        {
+            "number": "1",
+            "opts": {
+                "attributes": {
+                    "mac": "42:d1:c9:a6:e8:b5"
+                },
+                "hostname": "h1",
+                "nodeNum": 1,
+                "sched": "host"
+            },
+            "x": "346.0",
+            "y": "821.0"
+        },
+        {
+            "number": "2",
+            "opts": {
+                "attributes": {
+                    "mac": "3a:a0:37:ba:d3:33"
+                },
+                "hostname": "h2",
+                "nodeNum": 2,
+                "sched": "host"
+            },
+            "x": "359.0",
+            "y": "52.0"
+        },
+        {
+            "number": "3",
+            "opts": {
+                "attributes": {
+                    "mac": "1e:53:2d:d5:ff:d4"
+                },
+                "hostname": "h3",
+                "nodeNum": 3,
+                "sched": "host"
+            },
+            "x": "87.0",
+            "y": "828.0"
+        },
+        {
+            "number": "4",
+            "opts": {
+                "attributes": {
+                    "mac": "b6:4a:bf:97:fb:e5"
+                },
+                "hostname": "h4",
+                "nodeNum": 4,
+                "sched": "host"
+            },
+            "x": "603.0",
+            "y": "824.0"
+        }
+    ],
+    "links": [
+        {
+            "dest": "s3",
+            "opts": {
+                "bw": 100,
+                "cost": 10,
+                "delay": "25.36469667583559ms",
+                "port1": 3,
+                "port2": 4,
+                "useNodeGeo": "1"
+            },
+            "src": "s4"
+        },
+        {
+            "dest": "s7",
+            "opts": {
+                "bw": 10,
+                "cost": 50,
+                "delay": "0.0ms",
+                "port1": 4,
+                "port2": 1,
+                "useNodeGeo": "1"
+            },
+            "src": "s4"
+        },
+        {
+            "dest": "s5",
+            "opts": {
+                "port1": 1,
+                "port2": 1
+            },
+            "src": "h4"
+        },
+        {
+            "dest": "s3",
+            "opts": {
+                "bw": 40,
+                "cost": 5,
+                "delay": "26.506162410199906ms",
+                "port1": 2,
+                "port2": 5,
+                "useNodeGeo": "1"
+            },
+            "src": "s5"
+        },
+        {
+            "dest": "s7",
+            "opts": {
+                "bw": 50,
+                "cost": 2,
+                "delay": "1.1440531033170556ms",
+                "port1": 3,
+                "port2": 2,
+                "useNodeGeo": "1"
+            },
+            "src": "s5"
+        },
+        {
+            "dest": "s6",
+            "opts": {
+                "bw": 2000,
+                "cost": 3,
+                "delay": "1.599808364310184ms",
+                "port1": 4,
+                "port2": 2,
+                "useNodeGeo": "1"
+            },
+            "src": "s5"
+        },
+        {
+            "dest": "s6",
+            "opts": {
+                "bw": 100,
+                "cost": 2,
+                "delay": "20.011544796722198ms",
+                "port1": 5,
+                "port2": 5,
+                "useNodeGeo": "1"
+            },
+            "src": "s1"
+        },
+        {
+            "dest": "s7",
+            "opts": {
+                "bw": 60,
+                "cost": 4,
+                "delay": "17.93292931030975ms",
+                "port1": 6,
+                "port2": 5,
+                "useNodeGeo": "1"
+            },
+            "src": "s1"
+        },
+        {
+            "dest": "s6",
+            "opts": {
+                "port1": 6,
+                "port2": 6
+            },
+            "src": "s2"
+        },
+        {
+            "dest": "s3",
+            "opts": {
+                "port1": 7,
+                "port2": 6
+            },
+            "src": "s2"
+        },
+        {
+            "dest": "s7",
+            "opts": {
+                "port1": 8,
+                "port2": 6
+            },
+            "src": "s2"
+        },
+        {
+            "dest": "h2",
+            "opts": {
+                "port1": 10,
+                "port2": 2
+            },
+            "src": "s2"
+        },
+        {
+            "dest": "s1",
+            "opts": {
+                "bw": 1000,
+                "cost": 5,
+                "delay": "11.84066474734415ms",
+                "port1": 7,
+                "port2": 8,
+                "useNodeGeo": "1"
+            },
+            "src": "s3"
+        },
+        {
+            "dest": "s4",
+            "opts": {
+                "bw": 1000,
+                "cost": 2,
+                "delay": "2.136210059506453ms",
+                "port1": 7,
+                "port2": 7,
+                "useNodeGeo": "1"
+            },
+            "src": "s6"
+        },
+        {
+            "dest": "s10",
+            "opts": {
+                "port1": 1,
+                "port2": 1
+            },
+            "src": "h3"
+        },
+        {
+            "dest": "s9",
+            "opts": {
+                "port1": 2,
+                "port2": 1
+            },
+            "src": "s10"
+        },
+        {
+            "dest": "s4",
+            "opts": {
+                "port1": 2,
+                "port2": 2
+            },
+            "src": "s9"
+        },
+        {
+            "dest": "s8",
+            "opts": {
+                "port1": 1,
+                "port2": 1
+            },
+            "src": "h1"
+        },
+        {
+            "dest": "s1",
+            "opts": {
+                "port1": 2,
+                "port2": 2
+            },
+            "src": "s8"
+        },
+        {
+            "dest": "s9",
+            "opts": {
+                "port1": 3,
+                "port2": 3
+            },
+            "src": "s8"
+        },
+        {
+            "dest": "s1",
+            "opts": {
+                "port1": 3,
+                "port2": 3
+            },
+            "src": "s10"
+        },
+        {
+            "dest": "s1",
+            "opts": {
+                "port1": 2,
+                "port2": 4
+            },
+            "src": "s5"
+        }
+    ],
+    "switches": [
+        {
+            "number": "1",
+            "opts": {
+                "attributes": {
+                    "city": "Ottawa",
+                    "country": "Ontario",
+                    "datacenter": 0,
+                    "lat": "45.4208777",
+                    "lon": "-75.6901106",
+                    "mac": "96:08:2e:c0:0a:14"
+                },
+                "controllers": [
+                    "c0"
+                ],
+                "dpid": "100",
+                "hostname": "s1",
+                "netflow": "0",
+                "nodeNum": 1,
+                "sflow": "0",
+                "switchIP": "",
+                "switchType": "default"
+            },
+            "x": "352.0",
+            "y": "503.0"
+        },
+        {
+            "number": "2",
+            "opts": {
+                "attributes": {
+                    "datacenter": 1,
+                    "mac": "da:36:79:b5:1a:0e"
+                },
+                "controllers": [
+                    "c0"
+                ],
+                "dpid": "106",
+                "hostname": "s2",
+                "netflow": "0",
+                "nodeNum": 2,
+                "sflow": "0",
+                "switchIP": "",
+                "switchType": "default"
+            },
+            "x": "359.0",
+            "y": "182.0"
+        },
+        {
+            "number": "3",
+            "opts": {
+                "attributes": {
+                    "city": "Vancouver",
+                    "country": "Canada",
+                    "datacenter": 1,
+                    "lat": "49.2608724",
+                    "lon": "-123.113952",
+                    "mac": "9a:5f:53:ad:1c:a4"
+                },
+                "controllers": [
+                    "c0"
+                ],
+                "dpid": "104",
+                "hostname": "s3",
+                "netflow": "0",
+                "nodeNum": 3,
+                "sflow": "0",
+                "switchIP": "",
+                "switchType": "default"
+            },
+            "x": "359.0",
+            "y": "340.0"
+        },
+        {
+            "number": "4",
+            "opts": {
+                "attributes": {
+                    "city": "London",
+                    "country": "England",
+                    "datacenter": 1,
+                    "lat": "51.4893335",
+                    "lon": "-0.14405508452768728",
+                    "mac": "4a:e9:46:8b:29:c6"
+                },
+                "controllers": [
+                    "c0"
+                ],
+                "dpid": 102,
+                "hostname": "s4",
+                "netflow": "0",
+                "nodeNum": 4,
+                "sflow": "0",
+                "switchIP": "",
+                "switchType": "default"
+            },
+            "x": "90.0",
+            "y": "394.0"
+        },
+        {
+            "number": "5",
+            "opts": {
+                "attributes": {
+                    "city": "Paris",
+                    "country": "France",
+                    "datacenter": 1,
+                    "lat": "48.8534951",
+                    "lon": "2.3483915",
+                    "mac": "be:fa:73:25:80:f0"
+                },
+                "controllers": [
+                    "c0"
+                ],
+                "dpid": "101",
+                "hostname": "s5",
+                "netflow": "0",
+                "nodeNum": 5,
+                "sflow": "0",
+                "switchIP": "",
+                "switchType": "default"
+            },
+            "x": "603.0",
+            "y": "506.0"
+        },
+        {
+            "number": "6",
+            "opts": {
+                "attributes": {
+                    "city": "Frankfurt",
+                    "country": "Germany",
+                    "datacenter": 1,
+                    "lat": "50.1106444",
+                    "lon": "8.6820917",
+                    "mac": "f2:62:ea:a2:4c:f7"
+                },
+                "controllers": [
+                    "c0"
+                ],
+                "dpid": "105",
+                "hostname": "s6",
+                "netflow": "0",
+                "nodeNum": 6,
+                "sflow": "0",
+                "switchIP": "",
+                "switchType": "default"
+            },
+            "x": "89.0",
+            "y": "280.0"
+        },
+        {
+            "number": "7",
+            "opts": {
+                "attributes": {
+                    "city": "London",
+                    "country": "England",
+                    "datacenter": 1,
+                    "lat": "51.4893335",
+                    "lon": "-0.14405508452768728",
+                    "mac": "a2:11:df:1a:d6:0e"
+                },
+                "controllers": [
+                    "c0"
+                ],
+                "dpid": 103,
+                "hostname": "s7",
+                "netflow": "0",
+                "nodeNum": 7,
+                "sflow": "0",
+                "switchIP": "",
+                "switchType": "default"
+            },
+            "x": "604.0",
+            "y": "327.0"
+        },
+        {
+            "number": "8",
+            "opts": {
+                "controllers": [
+                    "c0"
+                ],
+                "hostname": "s8",
+                "nodeNum": 8,
+                "switchType": "default"
+            },
+            "x": "347.0",
+            "y": "605.0"
+        },
+        {
+            "number": "9",
+            "opts": {
+                "controllers": [
+                    "c0"
+                ],
+                "hostname": "s9",
+                "nodeNum": 9,
+                "switchType": "default"
+            },
+            "x": "90.0",
+            "y": "489.0"
+        },
+        {
+            "number": "10",
+            "opts": {
+                "controllers": [
+                    "c0"
+                ],
+                "hostname": "s10",
+                "nodeNum": 10,
+                "switchType": "default"
+            },
+            "x": "87.0",
+            "y": "606.0"
+        }
+    ],
+    "version": "2"
+}
