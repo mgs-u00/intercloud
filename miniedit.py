@@ -258,10 +258,18 @@ class PrefsDialog(tkSimpleDialog.Dialog):
         else:
             self.switchType.set("Open vSwitch Kernel Mode")
 
+        
+        # Selection of routing mode
+        Label(self.leftfieldFrame, text="Routing mode:").grid(row=4, sticky=E)
+        self.mode = StringVar(self.leftfieldFrame)
+        self.modeMenu = OptionMenu(self.leftfieldFrame, self.mode, "Performance", "Environmental", "Low-latency", "Throughput", "Balanced", "Minimal-cost")
+        self.modeMenu.grid(row=4, column=1, sticky=W)
+        modeType = self.prefValues['mode']
+        self.mode.set(modeType)
 
         # Fields for OVS OpenFlow version
         ovsFrame= LabelFrame(self.leftfieldFrame, text='Open vSwitch', padx=5, pady=5)
-        ovsFrame.grid(row=4, column=0, columnspan=2, sticky=EW)
+        ovsFrame.grid(row=5, column=0, columnspan=2, sticky=EW)
         Label(ovsFrame, text="OpenFlow 1.0:").grid(row=0, sticky=E)
         Label(ovsFrame, text="OpenFlow 1.1:").grid(row=1, sticky=E)
         Label(ovsFrame, text="OpenFlow 1.2:").grid(row=2, sticky=E)
@@ -362,6 +370,7 @@ class PrefsDialog(tkSimpleDialog.Dialog):
         ipBase = self.ipEntry.get()
         terminalType = self.terminalVar.get()
         startCLI = str(self.cliStart.get())
+        mode = self.mode.get()
         sw = self.switchType.get()
         dpctl = self.dpctlEntry.get()
 
@@ -382,7 +391,8 @@ class PrefsDialog(tkSimpleDialog.Dialog):
                        'dpctl':dpctl,
                        'sflow':sflowValues,
                        'netflow':nflowvalues,
-                       'startCLI':startCLI}
+                       'startCLI':startCLI,
+                       'mode': mode}
         if sw == 'Indigo Virtual Switch':
             self.result['switchType'] = 'ivs'
             if StrictVersion(MININET_VERSION) < StrictVersion('2.1'):
@@ -567,6 +577,13 @@ class HostDialog(CustomDialog):
         if 'attributes' in self.prefValues and 'mac' in self.prefValues['attributes']:
             self.macEntry.insert(0, self.prefValues['attributes']['mac'])
 
+        # Field for GDPR requirements
+        Label(self.propFrame, text="GDPR:").grid(row=10, sticky=E)
+        self.gdpr = Entry(self.propFrame)
+        self.gdpr.grid(row=10, column=1)
+        if 'attributes' in self.prefValues and 'gdpr' in self.prefValues['attributes']:
+            self.gdpr.insert(0, self.prefValues['attributes']['gdpr'])
+
         ### TAB 2
         # External Interfaces
         self.externalInterfaces = 0
@@ -667,6 +684,7 @@ class HostDialog(CustomDialog):
                    'city':self.city.get(),
                    'country':self.country.get(),
                    'mac':self.macEntry.get(),
+                   'gdpr':self.gdpr.get(),
                    'privateDirectory':privateDirectories,
                    'externalInterfaces':externalInterfaces,
                    'vlanInterfaces':vlanInterfaces}
@@ -746,6 +764,19 @@ class SwitchDialog(CustomDialog):
             self.datacenterButton.deselect()
         else:
             self.datacenterButton.select()
+
+        rowCount+=1
+
+        # Within EU flag for GDPR
+
+        Label(self.leftfieldFrame, text="In European Union:").grid(row=rowCount, sticky=E)
+        self.eu = IntVar()
+        self.euButton = Checkbutton(self.leftfieldFrame, variable=self.eu)
+        self.euButton.grid(row=rowCount, column=1, sticky=W)
+        if 'attributes' in self.prefValues and ('eu' not in self.prefValues['attributes'] or self.prefValues['attributes']['eu'] == '0'):
+            self.euButton.deselect()
+        else:
+            self.euButton.select()
 
         rowCount+=1
 
@@ -879,6 +910,7 @@ class SwitchDialog(CustomDialog):
                    'country':self.country.get(),
                    'mac':self.macEntry.get(),
                    'datacenter':self.datacenter.get(),
+                   'eu':self.eu.get(),
                    'sflow':str(self.sflow.get()),
                    'netflow':str(self.nflow.get()),
                    'dpctl':self.dpctlEntry.get(),
@@ -1225,6 +1257,7 @@ class MiniEdit( Frame ):
             "startCLI": "0",
             "terminalType": 'xterm',
             "switchType": 'ovs',
+            "mode": 'Balanced',
             "dpctl": '',
             'sflow':self.sflowDefaults,
             'netflow':self.nflowDefaults,
@@ -2635,6 +2668,9 @@ class MiniEdit( Frame ):
                 newHostOpts['attributes']['mac'] = hostBox.result['mac']
             else:
                 newHostOpts['attributes']['mac'] = Mininet.randMac()
+            
+            if len(hostBox.result['gdpr']) > 0:
+                newHostOpts['attributes']['gdpr'] = hostBox.result['gdpr']
 
             if len(hostBox.result['city']) > 0:
                 newHostOpts['attributes']['city'] = hostBox.result['city']
@@ -2700,7 +2736,7 @@ class MiniEdit( Frame ):
             else:
                 newSwitchOpts['attributes']['mac'] = Mininet.randMac()
 
-            newSwitchOpts['attributes']['datacenter'] = switchBox.result['datacenter']
+            newSwitchOpts['attributes']['eu'] = switchBox.result['eu']
 
             if len(switchBox.result['city']) > 0:
                 newSwitchOpts['attributes']['city'] = switchBox.result['city']

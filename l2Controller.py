@@ -4,6 +4,7 @@ import pox.openflow.libopenflow_01 as of
 import json
 import binascii
 import queue
+import sys
 
 log = core.getLogger()
 
@@ -27,20 +28,60 @@ class LearningSwitch (object):
         self.connection = connection
         # create mapping dict
         self.mac_to_port = {}
-        self.learnPaths('topo.mn')
+        self.learnPaths('topo3.mn')
         connection.addListeners(self)
 
     def learnPaths(self, topology):
         with open(topology) as fp:
             topology = json.load(fp)
 
-        metricWeights = {
-            'delay': 0.25,
-            'cost' : 0.2,
-            'bw': 0.2,
-            'processing': 0.35
-        }
+        if 'mode' in topology['application']:
+            self.mode = topology['application']['mode']
         
+
+        if self.mode == "Performance":
+            metricWeights = {
+                'delay': 0.5,
+                'cost' : 0,
+                'bw': 0.5,
+                'processing': 0
+            }
+        elif self.mode == "Environmental":
+            metricWeights = {
+                'delay': 0.025,
+                'cost' : 0.05,
+                'bw': 0.025,
+                'processing': 0.9
+            }
+        elif self.mode == "Low-latency":
+            metricWeights = {
+                'delay': 0.9,
+                'cost' : 0.025,
+                'bw': 0.05,
+                'processing': 0.025
+            }
+        elif self.mode == "Throughput":
+            metricWeights = {
+                'delay': 0.1,
+                'cost' : 0.05,
+                'bw': 0.8,
+                'processing': 0.05
+            }
+        elif self.mode == "Minimal-cost":
+            metricWeights = {
+                'delay': 0.025,
+                'cost' : 0.9,
+                'bw': 0.025,
+                'processing': 0.05
+            }
+        else:
+            metricWeights = {
+                'delay': 0.25,
+                'cost' : 0.2,
+                'bw': 0.2,
+                'processing': 0.35
+            }
+            
         # Map of MAC to node name
         self.nodeMACMap = {}
         # Map of ip to node name
@@ -57,6 +98,10 @@ class LearningSwitch (object):
         self.destHostMap = {}
         # Map of DPID to node
         self.nodeID = {}
+        # GDPR nodes
+        self.gdprNodes = []
+
+        self.metrics = {}
 
         for node in topology['hosts']:
             self.nodeMACMap[node['opts']['hostname']] = node['opts']['attributes']['mac']
@@ -69,7 +114,9 @@ class LearningSwitch (object):
         for node in topology['switches']:
             self.nodeMACMap[node['opts']['hostname']] = node['opts']['attributes']['mac']
             if 'dpid' in node['opts']:
-                self.nodeID[str(node['opts']['dpid'])] = node['opts']['hostname']            
+                self.nodeID[str(node['opts']['dpid'])] = node['opts']['hostname']
+            if 'eu' in node['opts']['attributes'] and node['opts']['attributes']['eu'] == 1:
+                self.gdprNodes.append(node['opts']['hostname'])
         
         for link in topology['links']:
             if link['src'] not in self.nodeGraph:
@@ -95,6 +142,10 @@ class LearningSwitch (object):
         for node in self.nodeAttribs:
             if node.startswith('h') and node != 'h2':
                 paths = find_all_paths(self.nodeGraph, node, 'h2')
+                if 'gdpr' in self.nodeAttribs[node]['attributes']:
+                    gdpr = True
+                else:
+                    gdpr = False
                 # print(paths)
                 calc = {}
                 for path in paths:
@@ -102,33 +153,48 @@ class LearningSwitch (object):
                     minbandwidth = 999999999999999999999999999
                     totalDelay = 0
                     totalCost = 0
+                    if gdpr and not path[-2] in self.gdprNodes:
+                        # print("Non-compliant: ", str(path))
+                        continue
+
                     for i in range(1, len(path)):
                         for elem in metricWeights:
                             link = "".join([path[i-1], path[i]])
                             if elem in self.linkAttribs[link]:
                                 if elem == 'delay':
-                                    totalDelay += float(self.linkAttribs[link][elem][:-2])
+                                    if self.linkAttribs[link][elem][:-2]:    
+                                        totalDelay += float(self.linkAttribs[link][elem][:-2])
                                 elif elem == 'cost':
                                     totalCost += int(self.linkAttribs[link][elem])
                                 elif elem == 'bw':
                                     if int(self.linkAttribs[link][elem]) < minbandwidth:
                                         minbandwidth = int(self.linkAttribs[link][elem])
-                                
+                    
+                    self.metrics[str(path)] = {}
+
+                    if gdpr:
+                        self.metrics[str(path)]['GDPR'] = "Compliant"
+
                     if minbandwidth != 999999999999999999999999999:
-                        print("Min bandwidth: " + str(minbandwidth))
+                        # print("Min bandwidth: " + str(minbandwidth))
+                        self.metrics[str(path)]['bandwidth'] = minbandwidth
                         overallWeight += metricWeights['bw'] * (1 / minbandwidth)
                     if totalDelay != 0:
-                        print("Delay: " + str(totalDelay))
+                        # print("Delay: " + str(totalDelay))
+                        self.metrics[str(path)]['delay'] = totalDelay
                         overallWeight += metricWeights[elem] * totalDelay
                     if totalCost != 0:
-                        print("Cost: " + str(totalCost))
+                        # print("Cost: " + str(totalCost))
+                        self.metrics[str(path)]['cost'] = totalCost
                         overallWeight += metricWeights[elem] * totalCost
-                    print("Processing cost: " + str(len(path)))
+                    # print("Processing cost: " + str(len(path)))
+                    self.metrics[str(path)]['processing'] = len(path)
                     overallWeight += metricWeights['processing'] * len(path)
-                    print("Total cost: " + str(overallWeight))
-                    print(str(path) + "\n\n")
+                    # print("Total cost: " + str(overallWeight))
+                    # print(str(path) + "\n\n")
 
                     calc[overallWeight] = path
+
                 # print(calc)
                 minWeight = min(list(calc.keys()))
                 # print(node, self.nodeMACMap)
@@ -138,7 +204,25 @@ class LearningSwitch (object):
                     self.bestPaths[self.nodeMACMap[calc[minWeight][-1]]] = {}    
                 self.bestPaths[self.nodeMACMap[node]][self.nodeMACMap[calc[minWeight][-1]]] = calc[minWeight]
                 self.bestPaths[self.nodeMACMap[calc[minWeight][-1]]][self.nodeMACMap[node]] = calc[minWeight][::-1]
-                print("Best Path: " + str(self.bestPaths) + "\n\n\n\n")
+                # print("Best Path: " + str(self.bestPaths) + "\n\n\n\n")
+            printedPaths = []
+            print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nMode:", self.mode, "\n")
+            for start in self.bestPaths:
+                for end in self.bestPaths[start]:
+                    path = self.bestPaths[start][end]
+                    if str(path) in self.metrics and str(path) not in printedPaths:
+                        printedPaths.append(str(path))
+                        metrics = self.metrics[str(path)]
+                        print("\n\n")
+                        print("For path", path[0], "<->", path[-1])
+                        print("\t Full Path:", str(path))
+                        for metric in metrics:
+                            print("\t", metric, ":", metrics[metric])
+                        
+
+
+
+
         
         # print(self.bestPaths, self.nodemap, self.nodeAttribs)
         
@@ -231,6 +315,7 @@ def launch ():
     # Setup the connections to the controller
     def start_switch (event):
         log.info("Controlling %s" % (event.connection,))
+        mode = sys.argv[1]
         LearningSwitch(event.connection)
     
     # Add mapping to start_switch function on new connection
