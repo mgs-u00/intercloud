@@ -44,7 +44,7 @@ class LearningSwitch (object):
                 'delay': 0.5,
                 'cost' : 0,
                 'bw': 0.5,
-                'processing': 0
+                'processing': 0.0
             }
         elif self.mode == "Environmental":
             metricWeights = {
@@ -162,8 +162,10 @@ class LearningSwitch (object):
                             link = "".join([path[i-1], path[i]])
                             if elem in self.linkAttribs[link]:
                                 if elem == 'delay':
-                                    if self.linkAttribs[link][elem][:-2]:    
+                                    if 'ms' in self.linkAttribs[link][elem]:
                                         totalDelay += float(self.linkAttribs[link][elem][:-2])
+                                    else:
+                                        totalDelay += float(self.linkAttribs[link][elem])
                                 elif elem == 'cost':
                                     totalCost += int(self.linkAttribs[link][elem])
                                 elif elem == 'bw':
@@ -171,6 +173,7 @@ class LearningSwitch (object):
                                         minbandwidth = int(self.linkAttribs[link][elem])
                     
                     self.metrics[str(path)] = {}
+                    # print(totalDelay)
 
                     if gdpr:
                         self.metrics[str(path)]['GDPR'] = "Compliant"
@@ -178,21 +181,21 @@ class LearningSwitch (object):
                     if minbandwidth != 999999999999999999999999999:
                         # print("Min bandwidth: " + str(minbandwidth))
                         self.metrics[str(path)]['bandwidth'] = minbandwidth
-                        overallWeight += metricWeights['bw'] * (1 / minbandwidth)
+                        overallWeight += metricWeights['bw'] * (1 / minbandwidth) * 100
                     if totalDelay != 0:
                         # print("Delay: " + str(totalDelay))
                         self.metrics[str(path)]['delay'] = totalDelay
-                        overallWeight += metricWeights[elem] * totalDelay
+                        overallWeight += metricWeights['delay'] * totalDelay
                     if totalCost != 0:
                         # print("Cost: " + str(totalCost))
                         self.metrics[str(path)]['cost'] = totalCost
-                        overallWeight += metricWeights[elem] * totalCost
+                        overallWeight += metricWeights['cost'] * totalCost
                     # print("Processing cost: " + str(len(path)))
                     self.metrics[str(path)]['processing'] = len(path)
                     overallWeight += metricWeights['processing'] * len(path)
                     # print("Total cost: " + str(overallWeight))
                     # print(str(path) + "\n\n")
-
+                    self.metrics[str(path)]['overallweight'] = overallWeight
                     calc[overallWeight] = path
 
                 # print(calc)
